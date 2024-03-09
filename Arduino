@@ -1,0 +1,81 @@
+#include <Stepper.h>
+#include <Servo.h>
+Servo myservo;
+int pos = 0;
+
+const int stepsPerRevolution = 2048;
+
+
+Stepper myStepper(stepsPerRevolution, 4, 6, 5, 7);
+const int trigPin = 9;
+const int echoPin = 10;
+
+long duration;
+int distance;
+
+
+const int closeThreshold = 20; 
+void setup() {
+  
+  Serial.begin(9600);
+  myservo.attach(3);
+  
+  
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  
+}
+
+void loop() {
+  if (Serial.available() > 0){
+    char color = Serial.read();
+
+    if (color == 'r'){
+      for (pos = 0; pos <= 45; pos += 1) {
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    
+    }
+    }
+    else if (color == 'g'){
+      for (pos = 45; pos >= 90; pos += 1) { // goes from 180 degrees to 0 degrees
+    myservo.write(pos);             // tell servo to go to position in variable 'pos'
+    
+    }
+    }
+    else {for (pos = 90; pos >= 135; pos += 1) { // goes from 180 degrees to 0 degrees
+    myservo.write(pos);}
+    
+    }
+  }
+  
+ 
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  
+  duration = pulseIn(echoPin, HIGH);
+  
+  
+  distance = duration * 0.034 / 2;
+  
+  
+  Serial.print("Distance: ");
+  Serial.println(distance);
+  
+  
+  if (distance < closeThreshold) {
+    
+    myStepper.setSpeed(5); 
+  } else {
+    
+    myStepper.setSpeed(13); 
+  }
+  
+ 
+  myStepper.step(200);
+  
+  
+}
