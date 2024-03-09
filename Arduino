@@ -31,19 +31,21 @@ void loop() {
     char color = Serial.read();
 
     if (color == 'r'){
-      for (pos = 0; pos <= 45; pos += 1) {
-    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+      myservo.write(45);
+      delay(100);
+                    // tell servo to go to position in variable 'pos'
     
-    }
+    
     }
     else if (color == 'g'){
-      for (pos = 45; pos >= 90; pos += 1) { // goes from 180 degrees to 0 degrees
-    myservo.write(pos);             // tell servo to go to position in variable 'pos'
+      myservo.write(91);
+      delay(100); // goes from 180 degrees to 0 degrees
+                  
     
     }
-    }
-    else {for (pos = 90; pos >= 135; pos += 1) { // goes from 180 degrees to 0 degrees
-    myservo.write(pos);}
+    
+    else if (color == 'b'){myservo.write(135);  // goes from 180 degrees to 0 degrees
+   
     
     }
   }
