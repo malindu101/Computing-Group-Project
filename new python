@@ -1,0 +1,60 @@
+import cv2
+import serial
+import time
+
+# Open serial connection to Arduino
+ser = serial.Serial('COM7', 9600)
+
+# Open webcam
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
+while True:
+    # Read frame from webcam
+    ret, frame = cap.read()
+    if not ret:
+        print("Failed to capture frame")
+        break
+
+    # Convert frame to HSV color space
+    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    height, width, _ = frame.shape
+
+    # Calculate center coordinates of the frame
+    cx = int(width / 2)
+    cy = int(height / 2)
+
+    # Get hue value of the center pixel
+    hue_value = hsv_frame[cy, cx, 0]
+
+    # Determine color based on hue value
+    if hue_value < 22:
+        color = "RED"
+        ser.write(b'r')  # Send 'r' to Arduino for red color
+    elif hue_value < 78:
+        color = "GREEN"
+        ser.write(b'g')  # Send 'g' to Arduino for green color
+    elif hue_value < 131:
+        color = "BLUE"
+        ser.write(b'b')  # Send 'b' to Arduino for blue color
+
+
+    # Display color text and center marker on the frame
+    cv2.putText(frame, color, (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 2)
+    cv2.circle(frame, (cx, cy), 5, (255, 0, 0), 3)
+    serial_output = ser.readline().decode().strip()  # Read a line from serial and decode it
+    print("Serial output:", serial_output)
+    
+
+    # Display the frame
+    cv2.imshow("Frame", frame)
+
+    # Check for 'Esc' key press to exit the loop
+    key = cv2.waitKey(1)
+    if key == 27:
+        break
+
+# Release webcam and close OpenCV windows
+cap.release()
+cv2.destroyAllWindows()
