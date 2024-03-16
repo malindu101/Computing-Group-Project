@@ -12,7 +12,7 @@ while True:
     ret, frame = cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # Define HSV ranges for red, blue, and green colors
+    # Define HSV ranges for red, blue, green, and black colors
     lower_red = np.array([0, 50, 50])
     upper_red = np.array([10, 255, 255])
 
@@ -22,10 +22,14 @@ while True:
     lower_green = np.array([50, 50, 50])
     upper_green = np.array([70, 255, 255])
 
+    lower_black = np.array([0, 0, 0])
+    upper_black = np.array([180, 255, 30])
+
     # Create masks for each color
     mask_red = cv2.inRange(hsv, lower_red, upper_red)
     mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
     mask_green = cv2.inRange(hsv, lower_green, upper_green)
+    mask_black = cv2.inRange(hsv, lower_black, upper_black)
 
     # Find contours for red color
     contours_red, _ = cv2.findContours(mask_red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -51,6 +55,14 @@ while True:
         if w > 50 and h > 50:
             ser.write(b'g')
 
+    # Find contours for black color
+    contours_black, _ = cv2.findContours(mask_black, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for c in contours_black:
+        x, y, w, h = cv2.boundingRect(c)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 0), 2)
+        if w > 50 and h > 50:
+            ser.write(b'k')
+
     # Read serial output from Arduino
     serial_output = ser.readline().decode().strip()  # Read a line from serial and decode it
     if serial_output:
@@ -66,3 +78,4 @@ while True:
 # Release video capture and close all windows
 cap.release()
 cv2.destroyAllWindows()
+
