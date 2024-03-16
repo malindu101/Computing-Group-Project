@@ -2,6 +2,13 @@
 #include <Servo.h>
 Servo myservo;
 int pos = 0;
+int red=0;
+int green=0;
+int blue=0;
+int total=0;
+bool newr = false;
+bool newg = false;
+bool newb = false;
 
 const int stepsPerRevolution = 2048;
 
@@ -30,27 +37,63 @@ void loop() {
   if (Serial.available() > 0){
     char color = Serial.read();
 
-    if (color == 'r'){
+    if(!newr && color == 'r'){
       myservo.write(45);
-      delay(100);
-                    // tell servo to go to position in variable 'pos'
-    
+      Serial.println(color);
+      red++;
+      total++;
+      newr = true;
+      newg = false;
+      newb = false;
+      Serial.println(red);
+      Serial.println(total);
+              
     
     }
-    else if (color == 'g'){
-      myservo.write(91);
-      delay(100); // goes from 180 degrees to 0 degrees
+    else if (!newg && color == 'g'){
+      myservo.write(75);
+      Serial.println(color);
+      green++;
+      total++;
+      newr = false;
+      newg = true;
+      newb = false;
+      Serial.println(green);
+      Serial.println(total);
+     
                   
     
     }
     
-    else if (color == 'b'){myservo.write(135);  // goes from 180 degrees to 0 degrees
+    else if (!newb && color == 'b'){
+    myservo.write(105);
+    Serial.println(color);
+    blue++;
+    total++;
+    newr = false;
+    newg = false;
+    newb = true;
+    Serial.println(blue);
+    Serial.println(total);
+    
+   
+    
+    }
+    else if (color == 'k'){
+    
+    
+    newr = false;
+    newg = false;
+    newb = false;
+    
+    
    
     
     }
   }
   
  
+
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
   digitalWrite(trigPin, HIGH);
@@ -64,8 +107,7 @@ void loop() {
   distance = duration * 0.034 / 2;
   
   
-  Serial.print("Distance: ");
-  Serial.println(distance);
+  
   
   
   if (distance < closeThreshold) {
@@ -81,3 +123,4 @@ void loop() {
   
   
 }
+
