@@ -67,6 +67,14 @@ void loop() {
   if (buttonState != lastButtonState && buttonState == LOW) {
     isRunning = !isRunning; // Toggle isRunning flag
     if (!isRunning) { // If loop should stop, reset variables
+      Serial.print("red");
+      Serial.print(red);
+      Serial.print("blue");
+      Serial.print(blue);
+      Serial.print("Green");
+      Serial.print(green);
+      Serial.print("Total");
+      Serial.print(total);
       red = 0;
       green = 0;
       blue = 0;
