@@ -1,0 +1,132 @@
+#include <Stepper.h>
+#include <Servo.h>
+
+Servo myservo;
+bool newon = false;
+bool embutton = false;
+int pos = 0;
+int red = 0;
+int green = 0;
+int blue = 0;
+int total = 0;
+bool newr = false;
+bool newg = false;
+bool newb = false;
+int pushButton1 = 2;
+const int buttonPin = 8;
+
+
+int buttonState = 0;
+int lastButtonState = 0;
+int emlastButtonState = 0; // to track button state changes
+int embuttonState =0;
+
+bool isRunning = false; // flag to indicate whether the loop should run
+const int stepsPerRevolution = 2048;
+
+Stepper myStepper(stepsPerRevolution, 4, 6, 5, 7);
+const int trigPin = 9;
+const int echoPin = 10;
+
+long duration;
+int distance;
+
+const int closeThreshold = 20;
+
+void setup() {
+  Serial.begin(9600);
+  myservo.attach(3);
+
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(buttonPin, INPUT_PULLUP); // Set button pin as input with internal pull-up resistor
+  pinMode(pushButton1, INPUT);
+}
+
+void loop() {
+  buttonState = digitalRead(buttonPin);
+  int buttonState1 = digitalRead(pushButton1);
+  if (!embutton &buttonState1 == 1) {
+    Serial.println("work");
+    embutton = true;
+  }
+  if (buttonState1 == 0) {
+    embutton = false;
+  }
+  
+
+  // Check for button press and toggle isRunning flag
+  if (buttonState != lastButtonState && buttonState == LOW) {
+    isRunning = !isRunning; // Toggle isRunning flag
+    if (!isRunning) { // If loop should stop, reset variables
+      red = 0;
+      green = 0;
+      blue = 0;
+      total = 0;
+    }
+  }
+  lastButtonState = buttonState;
+  if (buttonState1 != emlastButtonState && buttonState1 == LOW) {
+    isRunning = !isRunning; // Toggle isRunning flag
+  }
+  emlastButtonState = buttonState1;
+
+  if (isRunning) {
+    if (Serial.available() > 0) {
+      char color = Serial.read();
+
+      if (!newr && color == 'r') {
+        myservo.write(45);
+        Serial.println(color);
+        red++;
+        total++;
+        newr = true;
+        newg = false;
+        newb = false;
+        Serial.println(red);
+        Serial.println(total);
+      } else if (!newg && color == 'g') {
+        myservo.write(75);
+        Serial.println(color);
+        green++;
+        total++;
+        newr = false;
+        newg = true;
+        newb = false;
+        Serial.println(green);
+        Serial.println(total);
+      } else if (!newb && color == 'b') {
+        myservo.write(105);
+        Serial.println(color);
+        blue++;
+        total++;
+        newr = false;
+        newg = false;
+        newb = true;
+        Serial.println(blue);
+        Serial.println(total);
+      } else if (color == 'k') {
+        newr = false;
+        newg = false;
+        newb = false;
+      }
+    }
+
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+
+    duration = pulseIn(echoPin, HIGH);
+    distance = duration * 0.034 / 2;
+
+    if (distance < closeThreshold) {
+      myStepper.setSpeed(5);
+    } else {
+      myStepper.setSpeed(13);
+    }
+
+    myStepper.step(200);
+  }
+}
