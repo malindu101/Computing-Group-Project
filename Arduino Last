@@ -2,6 +2,7 @@
 #include <Servo.h>
 
 Servo myservo;
+int buzzer = 11;
 bool newon = false;
 bool embutton = false;
 int pos = 0;
@@ -47,8 +48,15 @@ void loop() {
   buttonState = digitalRead(buttonPin);
   int buttonState1 = digitalRead(pushButton1);
   if (!embutton &buttonState1 == 1) {
-    Serial.println("work");
-    embutton = true;
+    while (!embutton &buttonState1 == 1){
+    tone (buzzer, 450);
+    delay (500);
+    noTone (buzzer) ;
+    delay (500);
+    if(buttonState1==1){
+      break;
+    }
+    embutton = true;}
   }
   if (buttonState1 == 0) {
     embutton = false;
