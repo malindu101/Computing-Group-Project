@@ -3,7 +3,7 @@ import serial
 import numpy as np
 
 # Initialize serial communication with Arduino
-ser = serial.Serial('COM7', 9600, timeout=1)  # Replace COM7 with the serial port of your Arduino board
+ser = serial.Serial('COM4', 9600, timeout=1)  # Replace COM7 with the serial port of your Arduino board
 
 # Initialize video capture
 cap = cv2.VideoCapture(0)
@@ -63,10 +63,7 @@ while True:
         if w > 50 and h > 50:
             ser.write(b'k')
 
-    # Read serial output from Arduino
-    serial_output = ser.readline().decode().strip()  # Read a line from serial and decode it
-    if serial_output:
-        print("Serial output:", serial_output)
+    
 
     # Display the frame
     cv2.imshow('frame', frame)
