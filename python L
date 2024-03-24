@@ -12,18 +12,19 @@ while True:
     ret, frame = cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # Define HSV ranges for red, blue, green, and black colors
-    lower_red = np.array([0, 50, 50])
+    # Define HSV ranges for strong red, green, blue, and black colors
+    lower_red = np.array([0, 100, 100])
     upper_red = np.array([10, 255, 255])
 
-    lower_blue = np.array([90, 50, 50])
+    lower_blue = np.array([100, 100, 100])
     upper_blue = np.array([130, 255, 255])
 
-    lower_green = np.array([50, 50, 50])
-    upper_green = np.array([70, 255, 255])
+    lower_green = np.array([40, 100, 100])
+    upper_green = np.array([80, 255, 255])
 
     lower_black = np.array([0, 0, 0])
     upper_black = np.array([180, 255, 30])
+   
 
     # Create masks for each color
     mask_red = cv2.inRange(hsv, lower_red, upper_red)
@@ -31,28 +32,28 @@ while True:
     mask_green = cv2.inRange(hsv, lower_green, upper_green)
     mask_black = cv2.inRange(hsv, lower_black, upper_black)
 
-    # Find contours for red color
+    # Find contours for strong red color
     contours_red, _ = cv2.findContours(mask_red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in contours_red:
-        x, y, w, h = cv2.boundingRect(c)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        if w > 50 and h > 50:
+        if cv2.contourArea(c) > 1000:  # Adjust area threshold as needed
+            x, y, w, h = cv2.boundingRect(c)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
             ser.write(b'r')
 
-    # Find contours for blue color
+    # Find contours for strong blue color
     contours_blue, _ = cv2.findContours(mask_blue, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in contours_blue:
-        x, y, w, h = cv2.boundingRect(c)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        if w > 50 and h > 50:
+        if cv2.contourArea(c) > 1000:  # Adjust area threshold as needed
+            x, y, w, h = cv2.boundingRect(c)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
             ser.write(b'b')
 
-    # Find contours for green color
+    # Find contours for strong green color
     contours_green, _ = cv2.findContours(mask_green, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in contours_green:
-        x, y, w, h = cv2.boundingRect(c)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        if w > 50 and h > 50:
+        if cv2.contourArea(c) > 1000:  # Adjust area threshold as needed
+            x, y, w, h = cv2.boundingRect(c)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             ser.write(b'g')
 
     # Find contours for black color
@@ -62,9 +63,7 @@ while True:
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 0), 2)
         if w > 50 and h > 50:
             ser.write(b'k')
-
-    
-
+            
     # Display the frame
     cv2.imshow('frame', frame)
 
@@ -75,4 +74,5 @@ while True:
 # Release video capture and close all windows
 cap.release()
 cv2.destroyAllWindows()
+
 
